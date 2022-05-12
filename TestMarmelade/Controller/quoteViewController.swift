@@ -11,8 +11,21 @@ import UIKit
 
 class quoteViewController: UIViewController {
     
+    
+    
+    
+//    MARK: Variable
+    
     var End: Bool = false
+    var ProgressNumber = 0
+    var QuotePourcentage = "0 %"
+    var buttonLabel: String = "CITATION SUIVANTE"
+    var buttonLabelEnd: String = "FINIR"
+    var AuthorLabel: String = "AUTHOR"
+    var QuoteLabel: String = "QUOTE"
 
+
+    
     // MARK: Degrader background et bottomView
 
     lazy var gradient: CAGradientLayer = {
@@ -49,19 +62,15 @@ class quoteViewController: UIViewController {
     @IBOutlet weak var gradientView: UIView!
     @IBOutlet weak var bottomView: UIView!
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         gradientView.layer.addSublayer(gradient)
         bottomView.layer.cornerRadius = 12.0
        
-        
-        // appele de la fonction
-        quoteAuthor()
-        
-        
     }
-    
+
     
    
     
@@ -101,15 +110,20 @@ class quoteViewController: UIViewController {
     // MARK: Fonction clique button
     
     @IBAction func buttonNextQuote(_ sender: Any) {
-        if  End {
+    if  End {
             resetProgress()
             sliderProgress.value = 0
         } else {
         nextQuoteAuthor()
         sliderProgress.value += 1
         checkProgress()
+        ProgressNumber += 10
+        pourcentageProgress.text = "\(ProgressNumber) % "
+            if  ProgressNumber == 50 {
+                Alert()
+        }
     }
-        
+}
         
     
     // MARK: Fonction button nouvele quote et autheur
@@ -127,35 +141,50 @@ class quoteViewController: UIViewController {
             sliderProgress.value = 0
             smileyProgress.image = UIImage(named: "smiley_sick.png")
             sliderProgress.value = 0.0
-            
+            ProgressNumber = 0
+            pourcentageProgress.text = "0 % "
+            button.setTitle("CITATION SUIVANTE", for: .normal)
+            authorLabel.text = AuthorLabel
+            quoteLabel.text = QuoteLabel
             End = false
         }
-    
         
         // MARK: fonction qui chek le slider pour modifier les smiley ( changer pour le pourcentage de bonne reponse)
 
         
         func checkProgress() {
             
-            if sliderProgress.value < 4 {
+            if ProgressNumber < 20 {
                 smileyProgress.image =  UIImage(named: "smiley_sick.png")
-            } else if sliderProgress.value > 4 && sliderProgress.value < 7 {
+            } else if ProgressNumber > 20 && ProgressNumber < 60 {
                 smileyProgress.image = UIImage(named: "smiley_meh.png")
-            } else if sliderProgress.value > 7 {
+            } else if ProgressNumber > 60 {
                 smileyProgress.image =  UIImage(named: "smiley_awe.png")
             }
-            if sliderProgress.value == 10 {
-               End = true
-                sliderProgress.value = -10
+            if ProgressNumber == 100 {
+                End = true
+                button.setTitle("FINIR", for: .normal)
+                ProgressNumber = -10
             }
         }
-    }
     
-    // MARK: fonction qui reset le slider
 
-    func resetProgress() {
-       
-        sliderProgress.value = 0.0
+    
+    // MARK: fonction pour L'arlert a 50% et a la fin
+    
+    func Alert() {
+        let alert = UIAlertController(title: "Tu est a 50% des citations", message: " Tu as bientot fini! ", preferredStyle: .alert)
         
+        alert.addAction(UIAlertAction(title: "Continuer", style: .cancel, handler: { action in
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Arrêter", style: .destructive, handler: {(alert: UIAlertAction!)
+             in self.resetProgress()
+
+        }))
+        present(alert, animated: true)
     }
 }
+
+
